@@ -1,0 +1,330 @@
+/* pages/ai-debug/ai-debug.wxss */
+.container {
+  padding: 20rpx;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+/* 头部样式 */
+.header {
+  text-align: center;
+  margin-bottom: 40rpx;
+  padding: 30rpx;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 20rpx;
+  color: white;
+}
+
+.title {
+  display: block;
+  font-size: 48rpx;
+  font-weight: bold;
+  margin-bottom: 20rpx;
+}
+
+.subtitle {
+  display: block;
+  font-size: 28rpx;
+  opacity: 0.9;
+}
+
+/* 操作区域样式 */
+.action-section {
+  display: flex;
+  gap: 20rpx;
+  margin-bottom: 40rpx;
+}
+
+.debug-btn, .test-btn {
+  flex: 1;
+  height: 100rpx;
+  border-radius: 50rpx;
+  font-size: 32rpx;
+  font-weight: bold;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.debug-btn {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+  color: white;
+}
+
+.debug-btn.running {
+  background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+}
+
+.test-btn {
+  background: linear-gradient(135deg, #4ecdc4, #44a08d);
+  color: white;
+}
+
+.debug-btn:disabled, .test-btn:disabled {
+  opacity: 0.6;
+}
+
+/* 结果区域样式 */
+.result-section {
+  background: white;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin-bottom: 40rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.1);
+}
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30rpx;
+  padding-bottom: 20rpx;
+  border-bottom: 2rpx solid #f0f0f0;
+}
+
+.result-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.copy-btn {
+  background: #3498db;
+  color: white;
+  border: none;
+  padding: 15rpx 30rpx;
+  border-radius: 25rpx;
+  font-size: 24rpx;
+}
+
+.result-content {
+  display: flex;
+  flex-direction: column;
+  gap: 25rpx;
+}
+
+.status-item, .issue-item, .recommendations-item {
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+}
+
+.status-label, .issue-label, .recommendations-label {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #34495e;
+}
+
+.status-value, .issue-value {
+  font-size: 26rpx;
+  color: #2c3e50;
+  padding: 15rpx;
+  background: #f8f9fa;
+  border-radius: 10rpx;
+}
+
+.status-value.healthy {
+  color: #27ae60;
+  background: #d5f4e6;
+}
+
+.status-value.needs_data {
+  color: #f39c12;
+  background: #fef9e7;
+}
+
+.status-value.missing_collection {
+  color: #e74c3c;
+  background: #fadbd8;
+}
+
+.status-value.environment_error {
+  color: #c0392b;
+  background: #f8d7da;
+}
+
+.recommendations-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+}
+
+.recommendation-item {
+  font-size: 26rpx;
+  color: #2c3e50;
+  padding: 15rpx;
+  background: #f8f9fa;
+  border-radius: 10rpx;
+  border-left: 4rpx solid #3498db;
+}
+
+/* 历史记录区域样式 */
+.history-section {
+  background: white;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin-bottom: 40rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.1);
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30rpx;
+  padding-bottom: 20rpx;
+  border-bottom: 2rpx solid #f0f0f0;
+}
+
+.history-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.history-actions {
+  display: flex;
+  gap: 15rpx;
+}
+
+.toggle-btn, .clear-btn {
+  background: #95a5a6;
+  color: white;
+  border: none;
+  padding: 15rpx 25rpx;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+}
+
+.clear-btn {
+  background: #e74c3c;
+}
+
+.history-content {
+  margin-top: 20rpx;
+}
+
+.empty-history {
+  text-align: center;
+  padding: 60rpx;
+  color: #95a5a6;
+  font-size: 28rpx;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.history-item {
+  padding: 25rpx;
+  background: #f8f9fa;
+  border-radius: 15rpx;
+  border-left: 4rpx solid #3498db;
+  cursor: pointer;
+}
+
+.history-time {
+  font-size: 24rpx;
+  color: #7f8c8d;
+  margin-bottom: 15rpx;
+}
+
+.history-status {
+  margin-bottom: 15rpx;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 8rpx 16rpx;
+  border-radius: 20rpx;
+  font-size: 22rpx;
+  font-weight: bold;
+}
+
+.status-badge.healthy {
+  background: #d5f4e6;
+  color: #27ae60;
+}
+
+.status-badge.needs_data {
+  background: #fef9e7;
+  color: #f39c12;
+}
+
+.status-badge.missing_collection {
+  background: #fadbd8;
+  color: #e74c3c;
+}
+
+.status-badge.environment_error {
+  background: #f8d7da;
+  color: #c0392b;
+}
+
+.history-issue {
+  font-size: 26rpx;
+  color: #2c3e50;
+  line-height: 1.4;
+}
+
+/* 帮助说明区域样式 */
+.help-section {
+  background: white;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.1);
+}
+
+.help-header {
+  margin-bottom: 25rpx;
+  padding-bottom: 20rpx;
+  border-bottom: 2rpx solid #f0f0f0;
+}
+
+.help-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.help-content {
+  display: flex;
+  flex-direction: column;
+  gap: 15rpx;
+}
+
+.help-text {
+  font-size: 26rpx;
+  color: #34495e;
+  line-height: 1.5;
+  padding-left: 20rpx;
+  position: relative;
+}
+
+.help-text::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #3498db;
+  font-weight: bold;
+}
+
+/* 响应式设计 */
+@media (max-width: 750rpx) {
+  .action-section {
+    flex-direction: column;
+  }
+  
+  .debug-btn, .test-btn {
+    width: 100%;
+  }
+  
+  .history-header {
+    flex-direction: column;
+    gap: 20rpx;
+    align-items: flex-start;
+  }
+}

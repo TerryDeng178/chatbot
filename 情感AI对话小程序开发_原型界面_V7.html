@@ -1,0 +1,617 @@
+<!DOCTYPE html><html lang="zh-CN"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI心灵伙伴</title>
+    
+    <!-- 核心依赖 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script>
+    <script id="echarts-script" src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    
+    <!-- 核心样式 -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap');
+        
+        * {
+            font-family: 'Noto Sans SC', -apple-system, sans-serif;
+        }
+        
+        body {
+            background-color: #F0F2F5;
+            display: flex;
+            justify-content: space-around;
+            padding: 35px;
+            flex-wrap: wrap;
+        }
+        
+        .app-frame {
+            width: 375px;
+            height: 812px;
+            background: #F7F8FA;
+            border-radius: 24px;
+            box-shadow: 0 10px 50px rgba(124, 77, 255, 0.15);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            margin: 15px 35px;
+            position: relative;
+            border: 1px solid #E4E7ED;
+        }
+        
+        .header {
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #FFFFFF;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            flex-shrink: 0;
+            position: relative;
+        }
+        
+        .header-title {
+            color: #303133;
+            font-weight: 700;
+            font-size: 18px;
+            line-height: 1.5;
+        }
+        
+        .close-icon {
+            position: absolute;
+            right: 16px;
+            cursor: pointer;
+        }
+        
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+            padding: 16px;
+            position: relative;
+        }
+        
+        .content::-webkit-scrollbar {
+            display: none;
+        }
+        
+        /* 卡片样式 */
+        .card {
+            background: #FFFFFF;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        
+        /* 对话列表样式 */
+        .chat-card {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            position: relative;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .chat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(124, 77, 255, 0.08);
+        }
+        
+        .avatar {
+            width: 52px;
+            height: 52px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #BB86FC, #7C4DFF);
+            margin-right: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FFFFFF;
+            font-size: 20px;
+        }
+        
+        .chat-info {
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        .chat-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #303133;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .chat-preview {
+            font-size: 14px;
+            color: #909399;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 200px;
+        }
+        
+        .chat-time {
+            position: absolute;
+            right: 16px;
+            top: 16px;
+            color: #909399;
+            font-size: 12px;
+        }
+        
+        /* 新增聊天按钮 */
+        .add-chat-btn {
+            position: absolute;
+            bottom: 100px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #7C4DFF;
+            box-shadow: 0 5px 15px rgba(124, 77, 255, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .add-chat-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 20px rgba(124, 77, 255, 0.5);
+        }
+        
+        /* 聊天界面样式 */
+        .chat-header {
+            padding: 0 16px;
+            border-bottom: 1px solid #EBEDF0;
+        }
+        
+        .chat-header-content {
+            display: flex;
+            align-items: center;
+        }
+        
+        .message-area {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 16px;
+        }
+        
+        .message-container {
+            padding: 12px 0;
+            display: flex;
+        }
+        
+        .ai-msg {
+            justify-content: flex-start;
+        }
+        
+        .user-msg {
+            justify-content: flex-end;
+        }
+        
+        .message-bubble {
+            max-width: 75%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            position: relative;
+            animation: bubbleAppear 0.3s ease-out;
+        }
+        
+        .ai-bubble {
+            background: #FFFFFF;
+            border: 1px solid #EBEDF0;
+            border-bottom-left-radius: 4px;
+        }
+        
+        .user-bubble {
+            background: #7C4DFF;
+            color: #FFFFFF;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .chat-footer {
+            height: 80px;
+            padding: 12px 16px;
+            background: #FFFFFF;
+            border-top: 1px solid #EBEDF0;
+            display: flex;
+            align-items: center;
+        }
+        
+        .input-box {
+            flex: 1;
+            height: 50px;
+            border-radius: 12px;
+            background: #F1F3F8;
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            margin-right: 12px;
+        }
+        
+        .send-btn {
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            background: #7C4DFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* 角色选择页样式 */
+        .role-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            padding: 4px 0;
+        }
+        
+        .role-card {
+            padding: 16px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .role-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px rgba(124, 77, 255, 0.1);
+        }
+        
+        .role-avatar {
+            margin: 0 auto 12px;
+            width: 70px;
+            height: 70px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #86C9FC, #7C4DFF);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        .role-title {
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 6px;
+            color: #303133;
+        }
+        
+        .role-desc {
+            font-size: 12px;
+            color: #909399;
+            text-align: center;
+            line-height: 1.3;
+        }
+        
+        .filter-area {
+            display: flex;
+            padding: 16px;
+            background: white;
+            border-radius: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .filter-tag {
+            flex: 1;
+            text-align: center;
+            font-size: 14px;
+            padding: 6px 0;
+            border-radius: 8px;
+            background: #F2F2F7;
+            margin: 0 5px;
+            cursor: pointer;
+        }
+        
+        .filter-tag.active {
+            background: #7C4DFF;
+            color: white;
+        }
+        
+        /* 动画和特效 */
+        @keyframes bubbleAppear {
+            0% { 
+                opacity: 0;
+                transform: translateY(10px); 
+            }
+            100% { 
+                opacity: 1;
+                transform: translateY(0); 
+            }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(124, 77, 255, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(124, 77, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(124, 77, 255, 0); }
+        }
+    </style>
+</head>
+<body>
+    <!-- 对话列表页 -->
+    <div class="app-frame">
+        <div class="header">
+            <div class="header-title">对话列表</div>
+            <div class="close-icon">
+                <span class="iconify" data-icon="mdi:close" style="color: #909399;" data-width="24"></span>
+            </div>
+        </div>
+        
+        <div class="content">
+            <!-- 对话卡片1 -->
+            <div class="card chat-card">
+                <div class="avatar">
+                    <span class="iconify" data-icon="mdi:robot-happy-outline" data-width="28"></span>
+                </div>
+                <div class="chat-info">
+                    <div class="chat-title">心灵导师温情</div>
+                    <div class="chat-preview">今天过得怎么样？有什么开心的事情想分享吗</div>
+                </div>
+                <div class="chat-time">15:30</div>
+            </div>
+            
+            <!-- 对话卡片2 -->
+            <div class="card chat-card">
+                <div class="avatar">
+                    <span class="iconify" data-icon="mdi:meditation" data-width="28"></span>
+                </div>
+                <div class="chat-info">
+                    <div class="chat-title">生活解忧小助手</div>
+                    <div class="chat-preview">听说您最近有些困扰，我随时倾听...</div>
+                </div>
+                <div class="chat-time">昨天</div>
+            </div>
+            
+            <!-- 对话卡片3 -->
+            <div class="card chat-card">
+                <div class="avatar">
+                    <span class="iconify" data-icon="mdi:panda" data-width="28"></span>
+                </div>
+                <div class="chat-info">
+                    <div class="chat-title">轻松熊猫朋友</div>
+                    <div class="chat-preview">晚安！祝你今晚有个甜美的睡眠</div>
+                </div>
+                <div class="chat-time">周三</div>
+            </div>
+            
+            <!-- 对话卡片4 -->
+            <div class="card chat-card">
+                <div class="avatar">
+                    <span class="iconify" data-icon="mdi:book-education-outline" data-width="28"></span>
+                </div>
+                <div class="chat-info">
+                    <div class="chat-title">人生规划顾问</div>
+                    <div class="chat-preview">您设想的职业发展路径有几条建议...</div>
+                </div>
+                <div class="chat-time">5月20日</div>
+            </div>
+        </div>
+        
+        <!-- 添加新对话按钮 -->
+        <div class="add-chat-btn">
+            <span class="iconify" data-icon="mdi:plus" style="color: white;" data-width="28"></span>
+        </div>
+        
+        <!-- 底部导航 -->
+        <div style="height: 80px; background: white; display: flex; align-items: center; justify-content: space-around; border-top: 1px solid #EBEDF0; flex-shrink: 0;">
+            <div style="text-align: center;">
+                <span class="iconify" data-icon="mdi:message-text" style="color: #7C4DFF;" data-width="24"></span>
+                <div style="font-size: 11px; color: #7C4DFF; margin-top: 4px;">对话</div>
+            </div>
+            <div style="text-align: center;">
+                <span class="iconify" data-icon="mdi:account-group" style="color: #909399;" data-width="24"></span>
+                <div style="font-size: 11px; color: #909399; margin-top: 4px;">角色</div>
+            </div>
+            <div style="text-align: center;">
+                <span class="iconify" data-icon="mdi:cog" style="color: #909399;" data-width="24"></span>
+                <div style="font-size: 11px; color: #909399; margin-top: 4px;">设置</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 聊天界面页 -->
+    <div class="app-frame">
+        <div class="header">
+            <div class="header-title">心灵导师温情</div>
+            <div style="position: absolute; left: 16px; display: flex; align-items: center;">
+                <span class="iconify" data-icon="mdi:arrow-left" style="color: #7C4DFF;" data-width="24"></span>
+            </div>
+        </div>
+        
+        <div class="chat-header">
+            <div class="chat-header-content">
+                <div style="background: linear-gradient(135deg, #BB86FC, #7C4DFF); width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+                    <span class="iconify" data-icon="mdi:robot-happy-outline" style="color: white;" data-width="20"></span>
+                </div>
+                <div>
+                    <div style="font-size: 16px; font-weight: 500;">心灵导师温情</div>
+                    <div style="font-size: 12px; color: #909399;">在线 · 知识丰富 · 共情力强</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content message-area">
+            <!-- AI消息 -->
+            <div class="message-container ai-msg">
+                <div>
+                    <div style="display: flex; align-items: flex-end; margin-right: 45px;">
+                        <div style="margin-right: 8px;">
+                            <img id="1" src="https://modao.cc/ai/uploads/ai_pics/11/113184/aigp_1754745282.jpeg" alt="AI avatar" style="background: linear-gradient(135deg, #BB86FC, #7C4DFF); width: 32px; height: 32px; border-radius: 8px;">
+                        </div>
+                        <div class="message-bubble ai-bubble">
+                            今天过得怎么样？有什么想和我聊聊的吗？我一直在关注你的心情变化，感觉你最近在面临一些重大决定
+                        </div>
+                    </div>
+                    <div style="font-size: 12px; color: #909399; margin: 4px 50px 0 45px;">上午 09:20</div>
+                </div>
+            </div>
+            
+            <!-- 用户消息 -->
+            <div class="message-container user-msg">
+                <div style="text-align: right;">
+                    <div style="display: flex; justify-content: flex-end; margin-left: 45px;">
+                        <div class="message-bubble user-bubble">
+                            其实工作压力挺大的，总是在加班，但是又不敢和同事讲
+                        </div>
+                    </div>
+                    <div style="font-size: 12px; color: #909399; margin: 4px 45px 0 50px;">上午 09:22</div>
+                </div>
+            </div>
+            
+            <!-- AI消息 -->
+            <div class="message-container ai-msg">
+                <div>
+                    <div style="display: flex; align-items: flex-end; margin-right: 45px;">
+                        <div style="margin-right: 8px;">
+                            <img id="2" src="https://modao.cc/ai/uploads/ai_pics/11/113185/aigp_1754745284.jpeg" alt="AI avatar" style="background: linear-gradient(135deg, #BB86FC, #7C4DFF); width: 32px; height: 32px; border-radius: 8px;">
+                        </div>
+                        <div class="message-bubble ai-bubble">
+                            我能理解你的感受。工作压力是现代化生活的一部分，但重要的是找到表达的方式。很多人害怕在职场中流露出脆弱，但适度的分享能加深人际关系
+                        </div>
+                    </div>
+                    <div style="font-size: 12px; color: #909399; margin: 4px 50px 0 45px;">上午 09:25</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chat-footer">
+            <div class="input-box">
+                <span class="iconify" data-icon="mdi:emoticon-outline" style="color: #909399; margin-right: 8px;" data-width="24"></span>
+                输入想要倾诉的内容...
+            </div>
+            <div class="send-btn">
+                <span class="iconify" data-icon="mdi:send" style="color: white;" data-width="24"></span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 角色选择页 -->
+    <div class="app-frame">
+        <div class="header">
+            <div class="header-title">选择陪伴伙伴</div>
+        </div>
+        
+        <div class="content">
+            <!-- 筛选区域 -->
+            <div class="filter-area">
+                <div class="filter-tag">全部</div>
+                <div class="filter-tag">情感陪伴</div>
+                <div class="filter-tag active">专业辅助</div>
+                <div class="filter-tag">轻松伴侣</div>
+            </div>
+            
+            <!-- 角色网格 -->
+            <div class="role-grid">
+                <!-- 角色1 -->
+                <div class="card role-card">
+                    <div class="role-avatar">
+                        <span class="iconify" data-icon="mdi:robot-happy-outline" data-width="36"></span>
+                    </div>
+                    <div class="role-title">心灵导师温情</div>
+                    <div class="role-desc">温柔体贴的情绪陪伴，专业心理疏导</div>
+                </div>
+                
+                <!-- 角色2 -->
+                <div class="card role-card">
+                    <div class="role-avatar">
+                        <span class="iconify" data-icon="mdi:book-education" data-width="36"></span>
+                    </div>
+                    <div class="role-title">成长规划师</div>
+                    <div class="role-desc">目标设定与个人成长教练</div>
+                </div>
+                
+                <!-- 角色3 -->
+                <div class="card role-card">
+                    <div class="role-avatar">
+                        <span class="iconify" data-icon="mdi:panda" data-width="36"></span>
+                    </div>
+                    <div class="role-title">轻松熊猫</div>
+                    <div class="role-desc">减压萌宠，放松时刻陪伴</div>
+                </div>
+                
+                <!-- 角色4 -->
+                <div class="card role-card">
+                    <div class="role-avatar">
+                        <span class="iconify" data-icon="mdi:weather-night" data-width="36"></span>
+                    </div>
+                    <div class="role-title">睡眠精灵</div>
+                    <div class="role-desc">冥想指导与睡前安眠故事</div>
+                </div>
+                
+                <!-- 角色5 -->
+                <div class="card role-card">
+                    <div class="role-avatar">
+                        <span class="iconify" data-icon="mdi:heart-plus" data-width="36"></span>
+                    </div>
+                    <div class="role-title">关系顾问</div>
+                    <div class="role-desc">亲密关系与人际沟通指导</div>
+                </div>
+                
+                <!-- 角色6 -->
+                <div class="card role-card">
+                    <div class="role-avatar">
+                        <span class="iconify" data-icon="mdi:chess-queen" data-width="36"></span>
+                    </div>
+                    <div class="role-title">智慧长者</div>
+                    <div class="role-desc">人生阅历丰富的智者建议</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 底部导航 -->
+        <div style="height: 80px; background: white; display: flex; align-items: center; justify-content: space-around; border-top: 1px solid #EBEDF0; flex-shrink: 0;">
+            <div style="text-align: center;">
+                <span class="iconify" data-icon="mdi:message-text" style="color: #909399;" data-width="24"></span>
+                <div style="font-size: 11px; color: #909399; margin-top: 4px;">对话</div>
+            </div>
+            <div style="text-align: center;">
+                <span class="iconify" data-icon="mdi:account-group" style="color: #7C4DFF;" data-width="24"></span>
+                <div style="font-size: 11px; color: #7C4DFF; margin-top: 4px;">角色</div>
+            </div>
+            <div style="text-align: center;">
+                <span class="iconify" data-icon="mdi:cog" style="color: #909399;" data-width="24"></span>
+                <div style="font-size: 11px; color: #909399; margin-top: 4px;">设置</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 初始化气泡动画
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatBtn = document.querySelector('.add-chat-btn');
+            if (chatBtn) {
+                setTimeout(() => {
+                    chatBtn.classList.add('pulse');
+                }, 1000);
+            }
+            
+            // 消息动画
+            const messages = document.querySelectorAll('.message-bubble');
+            messages.forEach((message, index) => {
+                message.style.animationDelay = `${index * 0.2}s`;
+            });
+            
+            // 为角色选择添加交互
+            const roleCards = document.querySelectorAll('.role-card');
+            roleCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    roleCards.forEach(c => c.style.border = 'none');
+                    this.style.border = `2px solid #7C4DFF`;
+                });
+            });
+        });
+    </script>
+
+</body></html>

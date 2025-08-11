@@ -1,0 +1,44 @@
+name: Deploy CloudBase Functions
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch: {}
+
+env:
+  TCB_ENV_ID: cloud3-8gtjhkakd53d4fdc
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install CloudBase CLI
+        run: npm i -g @cloudbase/cli
+
+      - name: Deploy group-chat-get-messages
+        env:
+          TENCENTCLOUD_SECRET_ID: ${{ secrets.TENCENTCLOUD_SECRET_ID }}
+          TENCENTCLOUD_SECRET_KEY: ${{ secrets.TENCENTCLOUD_SECRET_KEY }}
+        run: |
+          cd src/backend/group-chat-get-messages
+          npm ci --no-audit --no-fund || npm i --no-audit --no-fund
+          tcb fn deploy group-chat-get-messages -e $TCB_ENV_ID --force
+
+      - name: Deploy group-chat-multi-ai
+        env:
+          TENCENTCLOUD_SECRET_ID: ${{ secrets.TENCENTCLOUD_SECRET_ID }}
+          TENCENTCLOUD_SECRET_KEY: ${{ secrets.TENCENTCLOUD_SECRET_KEY }}
+        run: |
+          cd src/backend/group-chat-multi-ai
+          npm ci --no-audit --no-fund || npm i --no-audit --no-fund
+          tcb fn deploy group-chat-multi-ai -e $TCB_ENV_ID --force
+
+

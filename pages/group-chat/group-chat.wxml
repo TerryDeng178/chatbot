@@ -1,0 +1,546 @@
+<!--pages/group-chat/group-chat.wxml-->
+<view class="group-chat-container">
+  <!-- 顶部导航栏 - V7设计 -->
+  <view class="top-nav">
+    <view class="nav-left">
+      <view class="back-btn" bindtap="goBack">
+        <text class="back-icon">←</text>
+      </view>
+    </view>
+    
+    <view class="nav-center">
+      <view class="group-info">
+        <text class="group-name">{{groupName}}</text>
+        <view class="group-meta">
+          <text class="member-count">{{groupInfo.memberCount || 0}}人</text>
+          <text class="group-status">活跃</text>
+        </view>
+      </view>
+    </view>
+    
+    <view class="nav-right">
+      <view class="nav-btn member-btn" bindtap="showMemberList">
+        <text class="nav-icon">👥</text>
+      </view>
+      <view class="nav-btn add-ai-btn" bindtap="showAddAISelector">
+        <text class="nav-icon">+</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- AI状态显示栏 - V7设计 -->
+  <view class="ai-status-bar" wx:if="{{multiAIMode && activeAIs.length > 0}}">
+    <view class="status-bar-header">
+      <view class="status-title">
+        <text class="status-icon">🤖</text>
+        <text class="status-text">AI助手</text>
+      </view>
+      <text class="status-count">{{activeAIs.length}}/5 已激活</text>
+    </view>
+    
+    <scroll-view class="ai-status-list" scroll-x="true" show-scrollbar="false">
+      <view 
+        class="ai-status-item {{item.isActive ? 'active' : 'inactive'}}" 
+        wx:for="{{aiStatusList}}" 
+        wx:key="id"
+        data-ai-id="{{item.id}}"
+        bindtap="toggleAIStatus"
+      >
+        <view class="ai-avatar">
+          <text class="ai-emoji">{{item.avatar}}</text>
+          <view class="ai-status-dot {{item.isActive ? 'online' : 'offline'}}"></view>
+        </view>
+        <text class="ai-name">{{item.nickname}}</text>
+        <view class="ai-toggle {{item.isActive ? 'active' : ''}}">
+          <text class="toggle-icon">{{item.isActive ? '✓' : '○'}}</text>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 消息列表区域 - V7设计 -->
+  <scroll-view 
+    class="message-list" 
+    scroll-y="true" 
+    scroll-into-view="{{scrollToView}}"
+    scroll-with-animation="true"
+    bindscrolltoupper="onLoadMore"
+    bindscroll="onScroll"
+    refresher-enabled="true"
+    bindrefresherrefresh="onPullDownRefresh"
+    refresher-triggered="{{refreshing}}"
+    show-scrollbar="false"
+  >
+    <!-- 加载更多提示 -->
+    <view class="load-more" wx:if="{{loading}}">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">加载中...</text>
+    </view>
+
+    <!-- 消息列表 -->
+    <view class="message-item" wx:for="{{messageList}}" wx:key="id" id="msg-{{item.id}}">
+      <!-- 用户消息 -->
+      <view class="message user-message" wx:if="{{item.role === 'user'}}">
+        <view class="message-avatar user-avatar">
+          <text class="avatar-emoji">👤</text>
+        </view>
+        <view class="message-content">
+          <view class="message-bubble user-bubble">
+            <text class="message-text">{{item.content}}</text>
+          </view>
+          <view class="message-time">{{item.time}}</view>
+        </view>
+      </view>
+
+      <!-- AI消息 -->
+      <view class="message ai-message" wx:elif="{{item.role === 'assistant'}}">
+        <view class="message-avatar ai-avatar">
+          <text class="avatar-emoji">{{item.aiCharacter.avatar || '🤖'}}</text>
+        </view>
+        <view class="message-content">
+          <view class="ai-identity" wx:if="{{item.aiCharacter}}">
+            <text class="ai-name">{{item.aiCharacter.nickname}}</text>
+            <text class="ai-personality">{{item.aiCharacter.name}}</text>
+          </view>
+          <view class="message-bubble ai-bubble">
+            <text class="message-text">{{item.content}}</text>
+          </view>
+          <view class="message-time">{{item.time}}</view>
+        </view>
+      </view>
+
+      <!-- 系统消息 -->
+      <view class="message system-message" wx:elif="{{item.role === 'system' || item.isSystemMessage}}">
+        <view class="message-bubble system-bubble">
+          <text class="message-text">{{item.content}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 发送中提示 -->
+    <view class="sending-indicator" wx:if="{{sending}}">
+      <view class="typing-dots">
+        <view class="dot"></view>
+        <view class="dot"></view>
+        <view class="dot"></view>
+      </view>
+      <text class="sending-text">AI正在思考中...</text>
+    </view>
+  </scroll-view>
+
+  <!-- 输入区域 - V7设计 -->
+  <view class="input-area">
+    <view class="input-container">
+      <view class="input-wrapper">
+        <input 
+          class="message-input" 
+          placeholder="输入消息..." 
+          placeholder-class="input-placeholder"
+          value="{{inputMessage}}"
+          bindinput="onInputChange"
+          bindconfirm="sendMessage"
+          bindfocus="onInputFocus"
+          bindblur="onInputBlur"
+          bindtap="onInputTap"
+          confirm-type="send"
+          maxlength="500"
+          focus="{{inputFocused}}"
+          cursor-spacing="20"
+        />
+        <view class="input-actions">
+          <view class="action-btn emoji-btn">
+            <text class="action-icon">😊</text>
+          </view>
+        </view>
+      </view>
+      <view class="send-btn {{inputMessage ? 'active' : ''}}" bindtap="sendMessage">
+        <text class="send-icon">→</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 添加AI选择器弹窗 - V7设计 -->
+  <view class="modal-overlay {{showAddAISelector ? 'show' : ''}}" bindtap="hideAddAISelector">
+    <view class="modal-content add-ai-modal" catchtap="stopPropagation">
+      <view class="modal-header">
+        <text class="modal-title">添加AI助手</text>
+        <view class="close-btn" bindtap="hideAddAISelector">
+          <text class="close-icon">×</text>
+        </view>
+      </view>
+      
+      <view class="modal-body">
+        <view class="ai-stats">
+          <view class="stat-item">
+            <text class="stat-value">{{activeAIs.length}}</text>
+            <text class="stat-label">当前激活</text>
+          </view>
+          <view class="stat-divider"></view>
+          <view class="stat-item">
+            <text class="stat-value">{{5 - activeAIs.length}}</text>
+            <text class="stat-label">可添加</text>
+          </view>
+        </view>
+        
+        <scroll-view class="ai-list" scroll-y="true" show-scrollbar="false">
+          <view 
+            class="ai-item" 
+            wx:for="{{availableAIs}}" 
+            wx:key="id"
+            data-ai-id="{{item.id}}"
+            bindtap="selectAIToAdd"
+          >
+            <view class="ai-item-avatar">
+              <text class="ai-item-emoji">{{item.avatar || '🤖'}}</text>
+            </view>
+            <view class="ai-item-info">
+              <text class="ai-item-name">{{item.nickname}}</text>
+              <text class="ai-item-type">{{item.personality}}</text>
+              <text class="ai-item-desc">{{item.description}}</text>
+            </view>
+            <view class="ai-item-action">
+              <view class="add-ai-btn">
+                <text class="add-icon">+</text>
+              </view>
+            </view>
+          </view>
+        </scroll-view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 成员列表弹窗 - V7设计 -->
+  <view class="modal-overlay {{showMemberModal ? 'show' : ''}}" bindtap="hideMemberList">
+    <view class="modal-content member-modal" catchtap="stopPropagation">
+      <view class="modal-header">
+        <text class="modal-title">群成员</text>
+        <view class="close-btn" bindtap="hideMemberList">
+          <text class="close-icon">×</text>
+        </view>
+      </view>
+      
+      <view class="modal-body">
+        <view class="member-count">
+          <text class="count-number">{{memberList.length}}</text>
+          <text class="count-label">位成员</text>
+        </view>
+        
+        <scroll-view class="member-list" scroll-y="true" show-scrollbar="false">
+          <view wx:if="{{memberList.length === 0}}" class="no-members">
+            <text class="no-members-icon">👥</text>
+            <text class="no-members-text">暂无成员信息</text>
+          </view>
+          <view class="member-item" wx:for="{{memberList}}" wx:key="id">
+            <view class="member-avatar">
+              <text class="member-emoji">{{item.avatar}}</text>
+            </view>
+            <view class="member-info">
+              <text class="member-name">{{item.name}}</text>
+              <text class="member-role">{{item.type}}</text>
+            </view>
+          </view>
+        </scroll-view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 其他弹窗保持原有结构，但样式会通过CSS优化 -->
+  <!-- 创建群聊弹窗 -->
+  <view class="modal-overlay {{showCreateGroupModal ? 'show' : ''}}" bindtap="hideCreateGroupModal">
+    <view class="modal-content create-group-modal" catchtap="stopPropagation">
+      <view class="modal-header">
+        <text class="modal-title">创建新群聊</text>
+        <view class="close-btn" bindtap="hideCreateGroupModal">
+          <text class="close-icon">×</text>
+        </view>
+      </view>
+      
+      <view class="modal-body">
+        <view class="form-group">
+          <text class="form-label">群聊名称 *</text>
+          <input 
+            class="form-input" 
+            placeholder="请输入群聊名称" 
+            value="{{newGroupData.groupName}}"
+            data-field="groupName"
+            bindinput="onCreateGroupInputChange"
+          />
+        </view>
+        
+        <view class="form-group">
+          <text class="form-label">群聊描述</text>
+          <textarea 
+            class="form-textarea" 
+            placeholder="请输入群聊描述" 
+            value="{{newGroupData.description}}"
+            data-field="description"
+            bindinput="onCreateGroupInputChange"
+            maxlength="200"
+          />
+        </view>
+        
+        <view class="form-group">
+          <text class="form-label">群聊头像</text>
+          <view class="avatar-selector" bindtap="selectGroupAvatar">
+            <text class="selected-avatar">{{newGroupData.avatar}}</text>
+            <text class="avatar-hint">点击选择</text>
+          </view>
+        </view>
+        
+        <view class="form-group">
+          <text class="form-label">最大成员数</text>
+          <input 
+            class="form-input" 
+            type="number" 
+            placeholder="100" 
+            value="{{newGroupData.maxMembers}}"
+            data-field="maxMembers"
+            bindinput="onCreateGroupInputChange"
+          />
+        </view>
+        
+        <view class="form-group">
+          <text class="form-label">初始AI助手 *</text>
+          <view class="ai-selector" bindtap="selectInitialAIs">
+            <text class="ai-hint">已选择 {{newGroupData.initialAIs.length}} 个AI</text>
+            <text class="ai-arrow">▼</text>
+          </view>
+          <view class="selected-ais">
+            <text class="selected-ai" wx:for="{{newGroupData.initialAINames}}" wx:key="index">
+              {{item}}
+            </text>
+          </view>
+        </view>
+        
+        <view class="form-group">
+          <text class="form-label">群聊设置</text>
+          <view class="setting-item">
+            <text class="setting-label">公开群聊</text>
+            <switch 
+              class="setting-switch" 
+              checked="{{newGroupData.isPublic}}"
+              data-field="isPublic"
+              bindchange="onCreateGroupInputChange"
+            />
+          </view>
+        </view>
+      </view>
+      
+      <view class="modal-footer">
+        <view class="action-btn secondary" bindtap="hideCreateGroupModal">
+          <text>取消</text>
+        </view>
+        <view class="action-btn primary" bindtap="confirmCreateGroup">
+          <text>创建群聊</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 群聊信息弹窗 -->
+  <view class="modal-overlay {{showGroupInfoModal ? 'show' : ''}}" bindtap="hideGroupInfoModal">
+    <view class="modal-content group-info-modal" catchtap="stopPropagation">
+      <view class="modal-header">
+        <text class="modal-title">群聊信息</text>
+        <view class="close-btn" bindtap="hideGroupInfoModal">
+          <text class="close-icon">×</text>
+        </view>
+      </view>
+      
+      <view class="modal-body">
+        <view class="info-section">
+          <view class="info-header">
+            <text class="info-avatar">{{groupInfo.avatar || '👥'}}</text>
+            <view class="info-basic">
+              <text class="info-name">{{groupInfo.groupName}}</text>
+              <text class="info-status">{{groupInfo.status === 'active' ? '活跃' : '已关闭'}}</text>
+            </view>
+          </view>
+          
+          <view class="info-description">
+            <text class="description-text">{{groupInfo.description || '暂无描述'}}</text>
+          </view>
+          
+          <view class="info-stats">
+            <view class="stat-item">
+              <text class="stat-label">成员数</text>
+              <text class="stat-value">{{groupInfo.memberCount || 0}}</text>
+            </view>
+            <view class="stat-item">
+              <text class="stat-label">消息数</text>
+              <text class="stat-value">{{groupInfo.stats.messageCount || 0}}</text>
+            </view>
+            <view class="stat-item">
+              <text class="stat-label">AI数量</text>
+              <text class="stat-value">{{groupInfo.activeAIs ? groupInfo.activeAIs.length : 0}}</text>
+            </view>
+          </view>
+          
+          <view class="info-tags" wx:if="{{groupInfo.tags && groupInfo.tags.length > 0}}">
+            <text class="tags-label">标签：</text>
+            <text class="tag-item" wx:for="{{groupInfo.tags}}" wx:key="index">{{item}}</text>
+          </view>
+          
+          <view class="info-created">
+            <text class="created-label">创建时间：</text>
+            <text class="created-time">{{groupInfo.createdAt}}</text>
+          </view>
+        </view>
+      </view>
+      
+      <view class="modal-footer">
+        <view class="action-btn secondary" bindtap="hideGroupInfoModal">
+          <text>关闭</text>
+        </view>
+        <view class="action-btn primary" bindtap="editGroupInfo" wx:if="{{groupInfo.userRole === 'owner' || groupInfo.userRole === 'admin'}}">
+          <text>编辑信息</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 编辑群聊信息弹窗 -->
+  <view class="modal-overlay {{showEditGroupModal ? 'show' : ''}}" bindtap="hideEditGroupModal">
+    <view class="modal-content edit-group-modal" catchtap="stopPropagation">
+      <view class="modal-header">
+        <text class="modal-title">编辑群聊信息</text>
+        <view class="close-btn" bindtap="hideEditGroupModal">
+          <text class="close-icon">×</text>
+        </view>
+      </view>
+      
+      <view class="modal-body">
+        <view class="form-group">
+          <text class="form-label">群聊名称 *</text>
+          <input 
+            class="form-input" 
+            placeholder="请输入群聊名称" 
+            value="{{editGroupData.groupName}}"
+            data-field="groupName"
+            bindinput="onEditGroupInputChange"
+          />
+        </view>
+        
+        <view class="form-group">
+          <text class="form-label">群聊描述</text>
+          <textarea 
+            class="form-textarea" 
+            placeholder="请输入群聊描述" 
+            value="{{editGroupData.description}}"
+            data-field="description"
+            bindinput="onEditGroupInputChange"
+            maxlength="200"
+          />
+        </view>
+        
+        <view class="form-group">
+          <text class="form-label">群聊头像</text>
+          <view class="avatar-selector" bindtap="selectGroupAvatar">
+            <text class="selected-avatar">{{editGroupData.avatar}}</text>
+            <text class="avatar-hint">点击选择</text>
+          </view>
+        </view>
+        
+        <view class="form-group">
+          <text class="form-label">最大成员数</text>
+          <input 
+            class="form-input" 
+            type="number" 
+            placeholder="100" 
+            value="{{editGroupData.maxMembers}}"
+            data-field="maxMembers"
+            bindinput="onEditGroupInputChange"
+          />
+        </view>
+        
+        <view class="form-group">
+          <text class="form-label">群聊设置</text>
+          <view class="setting-item">
+            <text class="setting-label">公开群聊</text>
+            <switch 
+              class="setting-switch" 
+              checked="{{editGroupData.isPublic}}"
+              data-field="isPublic"
+              bindchange="onEditGroupInputChange"
+            />
+          </view>
+        </view>
+      </view>
+      
+      <view class="modal-footer">
+        <view class="action-btn secondary" bindtap="hideEditGroupModal">
+          <text>取消</text>
+        </view>
+        <view class="action-btn primary" bindtap="confirmEditGroup">
+          <text>保存修改</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 成员管理弹窗 -->
+  <view class="modal-overlay {{showMemberManagementModal ? 'show' : ''}}" bindtap="hideMemberManagement">
+    <view class="modal-content member-management-modal" catchtap="stopPropagation">
+      <view class="modal-header">
+        <text class="modal-title">成员管理</text>
+        <view class="close-btn" bindtap="hideMemberManagement">
+          <text class="close-icon">×</text>
+        </view>
+      </view>
+      
+      <view class="modal-body">
+        <view class="management-actions">
+          <view class="action-item" bindtap="addMember">
+            <text class="action-icon">➕</text>
+            <text class="action-text">添加成员</text>
+          </view>
+          <view class="action-item" bindtap="showMemberList">
+            <text class="action-icon">👥</text>
+            <text class="action-text">查看成员</text>
+          </view>
+          <view class="action-item" bindtap="transferOwnership" wx:if="{{groupInfo.userRole === 'owner'}}">
+            <text class="action-icon">👑</text>
+            <text class="action-text">转让群主</text>
+          </view>
+        </view>
+        
+        <view class="member-list-section">
+          <text class="section-title">当前成员 ({{memberList.length}})</text>
+          <scroll-view class="member-list-scroll" scroll-y="true" show-scrollbar="false">
+            <view class="member-item" wx:for="{{memberList}}" wx:key="openid">
+              <view class="member-avatar">
+                <text class="member-emoji">{{item.avatarUrl || '👤'}}</text>
+              </view>
+              <view class="member-info">
+                <text class="member-name">{{item.nickName || '未知用户'}}</text>
+                <text class="member-role">{{item.role === 'owner' ? '群主' : item.role === 'admin' ? '管理员' : '成员'}}</text>
+                <text class="member-joined">加入时间：{{item.joinedAt}}</text>
+              </view>
+              <view class="member-actions" wx:if="{{groupInfo.userRole === 'owner' || (groupInfo.userRole === 'admin' && item.role === 'member')}}">
+                <view class="remove-btn" 
+                  data-member-openid="{{item.openid}}" 
+                  data-member-name="{{item.nickName || '未知用户'}}"
+                  bindtap="removeMember"
+                  wx:if="{{item.role !== 'owner'}}"
+                >
+                  <text class="remove-text">移除</text>
+                </view>
+              </view>
+            </view>
+          </scroll-view>
+        </view>
+      </view>
+      
+      <view class="modal-footer">
+        <view class="action-btn secondary" bindtap="hideMemberManagement">
+          <text>关闭</text>
+        </view>
+        <view class="action-btn danger" bindtap="leaveGroup" wx:if="{{groupInfo.userRole !== 'owner'}}">
+          <text>离开群聊</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+</view>
+

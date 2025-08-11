@@ -1,0 +1,79 @@
+/**
+ * 全局样式
+ */
+
+/**
+ * 全局设计语言变量
+ * 按照 /.trae/rules/UI_DESIGN_RULES.md v0.2 定义
+ */
+page {
+  /* 色彩搭配 */
+  --color-brand-primary: #7C4DFF; /* 品牌紫 */
+  --color-bg-page: #F7F8FA; /* 页面背景色 - V7原型精确颜色 */
+  --color-bg-card: #FFFFFF; /* 卡片/模块背景 */
+  --color-text-primary: #303133; /* 文本主色 */
+  --color-text-secondary: #909399; /* 文本辅色 */
+  --color-border: #EBEDF0; /* 边框/分割线 */
+  
+  /* 圆角半径 */
+  --radius-small: 8rpx;
+  --radius-default: 16rpx;
+  --radius-large: 32rpx; /* 16px = 32rpx */
+  --radius-round: 50%;
+
+  /* 间距 */
+  --spacing-xs: 8rpx;
+  --spacing-s: 16rpx;
+  --spacing-m: 24rpx;
+  --spacing-l: 32rpx;
+  --spacing-xl: 48rpx;
+
+  /* 字体大小 */
+  --font-size-xs: 20rpx;
+  --font-size-s: 24rpx;
+  --font-size-m: 28rpx;
+  --font-size-l: 32rpx;
+  --font-size-xl: 40rpx;
+
+  /* 阴影效果 */
+  --shadow-card: 0 8rpx 24rpx rgba(0, 0, 0, 0.03);
+  --shadow-button: 0 8rpx 32rpx rgba(124, 77, 255, 0.3);
+  --shadow-float: 0 10rpx 30rpx rgba(124, 77, 255, 0.4);
+
+  /* 默认页面背景和字体颜色 */
+  background-color: var(--color-bg-page);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-m);
+  box-sizing: border-box;
+  font-family: 'Noto Sans SC', -apple-system, sans-serif;
+}
+
+/* 针对iPhone X及以上机型的安全区域适配 */
+.safe-area-bottom {
+  padding-bottom: constant(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* 全局卡片样式 */
+.card {
+  background: var(--color-bg-card);
+  border-radius: var(--radius-large);
+  box-shadow: var(--shadow-card);
+  padding: var(--spacing-m);
+  margin-bottom: var(--spacing-m);
+}
+
+/* 全局按钮样式 */
+.btn-primary {
+  background-color: var(--color-brand-primary);
+  color: #FFFFFF;
+  border-radius: var(--radius-default);
+  border: none;
+  box-shadow: var(--shadow-button);
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2rpx);
+  box-shadow: 0 12rpx 40rpx rgba(124, 77, 255, 0.4);
+}

@@ -1,0 +1,22 @@
+{
+  "name": "group-chat-multi-ai",
+  "version": "1.0.0",
+  "description": "多AI群聊管理云函数",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "wechat",
+    "miniprogram",
+    "cloud",
+    "ai",
+    "chat",
+    "group"
+  ],
+  "author": "Your Name",
+  "license": "ISC",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

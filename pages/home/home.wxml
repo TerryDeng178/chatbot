@@ -1,0 +1,113 @@
+<!-- 群聊列表页 - 严格按照V7原型设计 -->
+<view class="container">
+  <!-- 顶部导航栏 -->
+  <view class="header">
+    <view class="header-title">群聊</view>
+  </view>
+
+  <!-- 主内容区域 -->
+  <view class="content">
+    <!-- 加载状态 -->
+    <view wx:if="{{loading}}" class="loading-container">
+      <view class="loading-spinner"></view>
+      <view class="loading-text">加载中...</view>
+    </view>
+
+    <!-- 错误状态 -->
+    <view wx:elif="{{!loading && groupList.length === 0 && hasError}}" class="error-state">
+      <view class="error-icon">⚠️</view>
+      <view class="error-text">加载失败</view>
+      <view class="error-subtext">网络连接异常，请检查网络设置</view>
+      <view class="retry-btn" bindtap="retryLoadGroups">重试</view>
+    </view>
+
+    <!-- 群聊列表 -->
+    <scroll-view wx:elif="{{!loading && groupList.length > 0}}" scroll-y="true" class="group-list-container" refresher-enabled="true" bindrefresherrefresh="onPullDownRefresh">
+      <view wx:for="{{groupList}}" wx:key="_id" class="card group-card" bindtap="navigateToGroup" data-group-id="{{item._id}}" data-group-name="{{item.name}}">
+        <!-- 群聊头像 -->
+        <view class="avatar group-avatar">
+          <view class="avatar-icon">{{item.topic === 'emotion-support' ? '💕' : item.topic === 'workplace-relax' ? '💼' : item.topic === 'night-chat' ? '🌙' : item.topic === 'creative-ideas' ? '✨' : item.topic === 'study-help' ? '📚' : '💬'}}</view>
+        </view>
+        
+        <!-- 群聊信息 -->
+        <view class="group-info">
+          <view class="group-header">
+            <view class="group-title">{{item.name}}</view>
+            <view wx:if="{{item.isPreset}}" class="preset-badge">官方</view>
+          </view>
+          <view class="group-description">{{item.description}}</view>
+          <view class="group-meta">
+            <view class="group-members">{{item.memberCount}}人</view>
+            <view class="group-last-message">{{item.lastMessage}}</view>
+          </view>
+        </view>
+        
+        <!-- 右侧信息 -->
+        <view class="group-right">
+          <view class="group-time">{{item.lastActiveAt}}</view>
+          <view wx:if="{{item.unreadCount > 0}}" class="unread-badge">{{item.unreadCount}}</view>
+        </view>
+      </view>
+    </scroll-view>
+
+    <!-- 空状态 -->
+    <view wx:elif="{{!loading && groupList.length === 0 && !hasError}}" class="empty-state">
+      <view class="empty-icon">💬</view>
+      <view class="empty-text">还没有群聊</view>
+      <view class="empty-subtext">点击右下角 + 创建你的第一个群聊</view>
+    </view>
+  </view>
+
+  <!-- 浮动操作按钮 - 圆形，品牌紫 -->
+  <view class="add-group-btn" bindtap="showCreateGroupModal">
+    <view class="add-icon">+</view>
+  </view>
+
+  <!-- 创建群聊弹窗 -->
+  <view wx:if="{{showCreateModal}}" class="modal-overlay" bindtap="hideCreateGroupModal">
+    <view class="modal-content" catchtap="stopPropagation">
+      <view class="modal-header">
+        <view class="modal-title">创建群聊</view>
+        <view class="modal-close" bindtap="hideCreateGroupModal">×</view>
+      </view>
+      
+      <view class="modal-body">
+        <view class="form-item">
+          <view class="form-label">群聊名称</view>
+          <input class="form-input" placeholder="请输入群聊名称" value="{{newGroupName}}" bindinput="onGroupNameInput" />
+        </view>
+        
+        <view class="form-item">
+          <view class="form-label">群聊主题</view>
+          <input class="form-input" placeholder="请输入群聊主题" value="{{newGroupTopic}}" bindinput="onGroupTopicInput" />
+        </view>
+        
+        <view class="form-item">
+          <view class="form-label">群聊描述</view>
+          <textarea class="form-textarea" placeholder="请输入群聊描述（可选）" value="{{newGroupDescription}}" bindinput="onGroupDescriptionInput" />
+        </view>
+      </view>
+      
+      <view class="modal-footer">
+        <view class="btn btn-cancel" bindtap="hideCreateGroupModal">取消</view>
+        <view class="btn btn-confirm" bindtap="createGroup">创建</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部标签栏 - V7原型：三个主导航（对话/角色/设置） -->
+  <view class="bottom-tab-bar">
+    <view class="tab-item active">
+      <view class="tab-icon">💬</view>
+      <view class="tab-text">对话</view>
+    </view>
+    <view class="tab-item" bindtap="navigateToRoles">
+      <view class="tab-icon">🤖</view>
+      <view class="tab-text">角色</view>
+    </view>
+    <view class="tab-item" bindtap="navigateToSettings">
+      <view class="tab-icon">⚙️</view>
+      <view class="tab-text">设置</view>
+    </view>
+  </view>
+</view>

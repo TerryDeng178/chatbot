@@ -1,0 +1,14 @@
+{
+  "name": "report-unlock",
+  "version": "1.0.0",
+  "description": "Reports that a user has unlocked a specific feature.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "tcb-admin-node": "latest"
+  }
+}

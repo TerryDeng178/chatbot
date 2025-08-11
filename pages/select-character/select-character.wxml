@@ -1,0 +1,143 @@
+<!-- 角色选择页 - 严格按照V7原型设计 -->
+<view class="character-container">
+  <!-- 顶部导航栏 -->
+  <view class="header">
+    <view class="header-title">选择陪伴伙伴</view>
+  </view>
+
+  <!-- 主内容区域 -->
+  <view class="content">
+    <!-- 筛选区域 - 按照V7设计 -->
+    <view class="filter-area">
+      <view 
+        class="filter-tag {{currentFilter === item.key ? 'active' : ''}}"
+        wx:for="{{filterTags}}" 
+        wx:key="key"
+        bindtap="onFilterChange"
+        data-filter="{{item.key}}"
+      >
+        {{item.name}}
+      </view>
+    </view>
+    
+    <!-- 角色网格 - 按照V7设计 -->
+    <scroll-view class="character-scroll" scroll-y="true">
+      <view class="role-grid">
+        <view 
+          class="card role-card"
+          wx:for="{{filteredCharacters}}" 
+          wx:key="id"
+          bindtap="openCharacterEditor"
+          data-character="{{item}}"
+        >
+          <!-- 角色头像 - 圆角矩形 -->
+          <view class="role-avatar">
+            <view class="role-icon">🤖</view>
+          </view>
+          
+          <!-- 角色信息 -->
+          <view class="role-title">{{item.name}}</view>
+          <view class="role-desc">{{item.description}}</view>
+
+          <!-- 编辑标签 -->
+          <view class="edit-hint">点击调整个性</view>
+          
+          <!-- 解锁状态指示器 -->
+          <view class="unlock-indicator" wx:if="{{!item.unlocked}}">
+            <view class="lock-icon">🔒</view>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 角色个性编辑弹窗 -->
+  <view class="character-modal {{showEditor ? 'show' : ''}}" bindtap="closeEditor">
+    <view class="modal-content" catchtap="stopPropagation">
+      <view class="modal-header">
+        <view class="modal-avatar"><view class="modal-icon-emoji">{{editingCharacter.icon || '🤖'}}</view></view>
+        <view class="modal-close" bindtap="closeEditor"><view class="close-emoji">✕</view></view>
+      </view>
+      <view class="modal-body">
+        <view class="modal-name">{{editingCharacter.name}}</view>
+        <view class="form-row">
+          <view class="form-label">性别</view>
+          <picker mode="selector" range="{{genderOptions}}" value="{{genderIndex}}" bindchange="onGenderChange">
+            <view class="picker-value">{{genderOptions[genderIndex]}}</view>
+          </picker>
+        </view>
+        <view class="form-row">
+          <view class="form-label">性格/说话方式</view>
+          <picker mode="selector" range="{{styleOptions}}" value="{{styleIndex}}" bindchange="onStyleChange">
+            <view class="picker-value">{{styleOptions[styleIndex]}}</view>
+          </picker>
+        </view>
+        <view class="form-row">
+          <view class="form-label">身份</view>
+          <picker mode="selector" range="{{identityOptions}}" value="{{identityIndex}}" bindchange="onIdentityChange">
+            <view class="picker-value">{{identityOptions[identityIndex]}}</view>
+          </picker>
+        </view>
+        <view class="form-row">
+          <view class="form-label">设定（与用户关系）</view>
+          <picker mode="selector" range="{{relationshipOptions}}" value="{{relationshipIndex}}" bindchange="onRelationshipChange">
+            <view class="picker-value">{{relationshipOptions[relationshipIndex]}}</view>
+          </picker>
+        </view>
+      </view>
+      <view class="modal-footer">
+        <view class="modal-btn cancel" bindtap="closeEditor">取消</view>
+        <view class="modal-btn confirm" bindtap="saveCharacterProfile">保存</view>
+      </view>
+    </view>
+  </view>
+  <!-- 底部标签栏 - V7原型：三个主导航（对话/角色/设置） -->
+  <view class="bottom-tab-bar">
+    <view class="tab-item" bindtap="navigateToHome">
+      <view class="tab-icon">💬</view>
+      <view class="tab-text">对话</view>
+    </view>
+    <view class="tab-item active">
+      <view class="tab-icon">🤖</view>
+      <view class="tab-text">角色</view>
+    </view>
+    <view class="tab-item" bindtap="navigateToSettings">
+      <view class="tab-icon">⚙️</view>
+      <view class="tab-text">设置</view>
+    </view>
+  </view>
+  
+  <!-- 角色详情弹窗 -->
+  <view class="character-modal {{showModal ? 'show' : ''}}" bindtap="hideModal">
+    <view class="modal-content" catchtap="stopPropagation">
+      <view class="modal-header">
+        <view class="modal-avatar">
+          <view class="modal-icon-emoji">🤖</view>
+        </view>
+        <view class="modal-close" bindtap="hideModal">
+          <view class="close-emoji">✕</view>
+        </view>
+      </view>
+      
+      <view class="modal-body">
+        <view class="modal-name">{{selectedCharacter.name}}</view>
+        <view class="modal-desc">{{selectedCharacter.description}}</view>
+        <!-- 模型信息显示 -->
+        <view class="modal-model-info">
+          <view class="model-tag">{{selectedCharacter.modelDesc}}</view>
+        </view>
+        <view class="modal-detail">{{selectedCharacter.detail}}</view>
+      </view>
+      
+      <view class="modal-footer">
+        <view class="modal-btn cancel" bindtap="hideModal">取消</view>
+        <view 
+          class="modal-btn confirm {{selectedCharacter.unlocked ? '' : 'locked'}}"
+          bindtap="confirmSelect"
+        >
+          {{selectedCharacter.unlocked ? '开始对话' : '观看广告解锁'}}
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

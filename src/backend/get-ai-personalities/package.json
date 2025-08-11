@@ -1,0 +1,12 @@
+{
+  "name": "get-ai-personalities",
+  "version": "1.0.0",
+  "description": "获取AI性格列表云函数",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  },
+  "keywords": ["云函数", "AI", "性格列表"],
+  "author": "",
+  "license": "ISC"
+}

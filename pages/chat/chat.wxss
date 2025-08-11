@@ -1,0 +1,323 @@
+/* 聊天界面页样式 - 像素级还原V7原型 */
+@import '/app.wxss';
+
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: var(--color-bg-page); /* F7F8FA - V7原型精确颜色 */
+}
+
+/* 顶部导航栏 - 按照V7设计 */
+.header {
+  height: 112rpx; /* 56px = 112rpx */
+  display: flex;
+  align-items: center;
+  background: var(--color-bg-card); /* FFFFFF */
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.05);
+  flex-shrink: 0;
+  position: relative;
+}
+
+.header-content {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.back-btn {
+  position: absolute;
+  left: 32rpx; /* 16px = 32rpx */
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.back-btn .back-icon {
+  font-size: 48rpx; /* 24px = 48rpx */
+  color: #7C4DFF; /* V7原型精确颜色 */
+}
+
+.header-title {
+  color: var(--color-text-primary); /* 303133 */
+  font-weight: 700;
+  font-size: 36rpx; /* 18px = 36rpx */
+  line-height: 1.5;
+}
+
+/* 聊天头部信息 - 像素级还原V7原型 */
+.chat-header {
+  padding: 0 32rpx; /* V7原型: 16px = 32rpx */
+  border-bottom: 1rpx solid #EBEDF0; /* V7原型精确边框色 */
+  background: #FFFFFF; /* V7原型精确背景色 */
+}
+
+.chat-header-content {
+  display: flex;
+  align-items: center;
+  padding: 24rpx 0; /* V7原型调整间距 */
+}
+
+.character-avatar {
+  background: linear-gradient(135deg, #BB86FC, #7C4DFF); /* V7原型精确渐变 */
+  width: 80rpx; /* V7原型: 40px = 80rpx */
+  height: 80rpx; /* V7原型: 40px = 80rpx */
+  border-radius: 16rpx; /* V7原型: 8px = 16rpx */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 24rpx; /* V7原型: 12px = 24rpx */
+  color: #FFFFFF;
+}
+
+.character-avatar .character-icon {
+  font-size: 40rpx; /* V7原型: 20px = 40rpx */
+  color: #FFFFFF;
+}
+
+.character-info {
+  flex: 1;
+}
+
+.character-name {
+  font-size: 32rpx; /* V7原型: 16px = 32rpx */
+  font-weight: 500;
+  color: #303133; /* V7原型精确颜色 */
+  margin-bottom: 4rpx;
+}
+
+.character-status {
+  font-size: 24rpx; /* V7原型: 12px = 24rpx */
+  color: #909399; /* V7原型精确颜色 */
+}
+
+/* 消息区域 - 按照V7设计 */
+.message-area {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 32rpx; /* 16px = 32rpx */
+}
+
+.messages-content {
+  padding: 0;
+}
+
+.message-container {
+  padding: 24rpx 0; /* 12px = 24rpx */
+  display: flex;
+}
+
+.ai-msg {
+  justify-content: flex-start;
+}
+
+.user-msg {
+  justify-content: flex-end;
+}
+
+.message-wrapper {
+  max-width: 75%;
+}
+
+.user-wrapper {
+  text-align: right;
+}
+
+/* AI消息样式 - 像素级还原V7原型 */
+.ai-message-row {
+  display: flex;
+  align-items: flex-end;
+  margin-right: 90rpx; /* V7原型: 45px = 90rpx */
+  margin-left: 32rpx; /* V7原型: 16px = 32rpx，增加左边距避免太靠边 */
+}
+
+.ai-avatar-small {
+  margin-right: 16rpx; /* V7原型: 8px = 16rpx */
+  background: linear-gradient(135deg, #BB86FC, #7C4DFF); /* V7原型精确渐变 */
+  width: 64rpx; /* V7原型: 32px = 64rpx */
+  height: 64rpx; /* V7原型: 32px = 64rpx */
+  border-radius: 16rpx; /* V7原型: 8px = 16rpx */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  flex-shrink: 0;
+}
+
+.ai-avatar-small .ai-icon,
+.ai-avatar-small .loading-icon {
+  font-size: 32rpx; /* V7原型: 16px = 32rpx */
+  color: #FFFFFF;
+}
+
+/* 用户消息样式 - 像素级还原V7原型 */
+.user-message-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  margin-left: 90rpx; /* V7原型: 45px = 90rpx */
+  margin-right: 32rpx; /* V7原型: 16px = 32rpx，右侧留白避免太靠边 */
+}
+
+.user-avatar-small {
+  margin-left: 16rpx; /* V7原型: 8px = 16rpx */
+  background: linear-gradient(135deg, #42A5F5, #1E88E5); /* V7原型: 蓝色系渐变 */
+  width: 64rpx; /* V7原型: 32px = 64rpx */
+  height: 64rpx; /* V7原型: 32px = 64rpx */
+  border-radius: 16rpx; /* V7原型: 8px = 16rpx，圆角矩形 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.user-icon {
+  font-size: 32rpx; /* V7原型: 16px = 32rpx */
+  color: #FFFFFF;
+}
+
+/* 消息气泡样式 - 像素级还原V7原型 */
+.message-bubble {
+  max-width: 75%; /* V7原型精确最大宽度 */
+  padding: 24rpx 32rpx; /* V7原型: 12px = 24rpx, 16px = 32rpx */
+  border-radius: 36rpx; /* V7原型: 18px = 36rpx */
+  position: relative;
+  animation: bubbleAppear 0.3s ease-out;
+  font-size: 28rpx; /* V7原型: 14px = 28rpx */
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.ai-bubble {
+  background: #FFFFFF; /* V7原型精确背景色 */
+  border: 1rpx solid #EBEDF0; /* V7原型精确边框色 */
+  border-bottom-left-radius: 8rpx; /* V7原型: 4px = 8rpx */
+  color: #303133; /* V7原型精确文字色 */
+}
+
+.user-bubble {
+  background: #7C4DFF; /* V7原型精确背景色 */
+  color: #FFFFFF;
+  border-bottom-right-radius: 8rpx; /* V7原型: 4px = 8rpx */
+}
+
+/* 消息时间 */
+.message-time {
+  font-size: 24rpx; /* 12px = 24rpx */
+  color: var(--color-text-secondary); /* 909399 */
+  margin: 8rpx 100rpx 0 122rpx; /* 4px = 8rpx, 50px = 100rpx, 左边距=90rpx+32rpx=122rpx与AI消息对齐 */
+}
+
+.user-time {
+  text-align: right;
+  margin: 8rpx 32rpx 0 100rpx; /* V7原型: 调整右边距与消息一致 */
+}
+
+/* 加载中样式 */
+.loading-bubble {
+  padding: 24rpx 32rpx;
+}
+
+.typing-indicator {
+  display: flex;
+  align-items: center;
+}
+
+.typing-indicator .dot {
+  width: 12rpx;
+  height: 12rpx;
+  background-color: var(--color-text-secondary);
+  border-radius: 50%;
+  margin: 0 4rpx;
+  animation: typing 1.2s infinite ease-in-out;
+}
+
+.typing-indicator .dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-indicator .dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typing {
+  0%, 80%, 100% {
+    transform: scale(0);
+  }
+  40% {
+    transform: scale(1.0);
+  }
+}
+
+@keyframes bubbleAppear {
+  0% {
+    opacity: 0;
+    transform: translateY(20rpx);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 底部输入区域 - 像素级还原V7原型 */
+.chat-footer {
+  height: 160rpx; /* V7原型: 80px = 160rpx */
+  padding: 24rpx 32rpx; /* V7原型: 12px = 24rpx, 16px = 32rpx */
+  background: #FFFFFF; /* V7原型精确背景色 */
+  border-top: 1rpx solid #EBEDF0; /* V7原型精确边框色 */
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
+}
+
+.input-box {
+  flex: 1;
+  height: 100rpx; /* V7原型: 50px = 100rpx */
+  border-radius: 24rpx; /* V7原型: 12px = 24rpx */
+  background: #F1F3F8; /* V7原型精确背景色 */
+  padding: 0 32rpx; /* V7原型: 16px = 32rpx */
+  display: flex;
+  align-items: center;
+  margin-right: 24rpx; /* V7原型: 12px = 24rpx */
+}
+
+.emoji-btn {
+  font-size: 48rpx; /* V7原型: 24px = 48rpx */
+  color: #909399; /* V7原型精确颜色 */
+  margin-right: 16rpx; /* V7原型: 8px = 16rpx */
+}
+
+.message-input {
+  flex: 1;
+  height: 100%;
+  font-size: 28rpx; /* V7原型: 14px = 28rpx */
+  color: #303133; /* V7原型精确文字色 */
+  background: transparent;
+  border: none;
+}
+
+.send-btn {
+  width: 104rpx; /* V7原型: 52px = 104rpx */
+  height: 104rpx; /* V7原型: 52px = 104rpx */
+  border-radius: 24rpx; /* V7原型: 12px = 24rpx */
+  background: #7C4DFF; /* V7原型精确背景色 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s;
+  flex-shrink: 0;
+}
+
+.send-btn.active {
+  background: #7C4DFF; /* V7原型保持一致 */
+}
+
+.send-btn .send-icon {
+  font-size: 48rpx; /* V7原型: 24px = 48rpx */
+  color: #FFFFFF;
+}

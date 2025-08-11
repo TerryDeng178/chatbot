@@ -1,0 +1,9 @@
+{
+  "name": "user-reset-quota",
+  "version": "1.0.0",
+  "description": "重置用户消息额度",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

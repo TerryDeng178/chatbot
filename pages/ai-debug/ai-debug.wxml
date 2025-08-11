@@ -1,0 +1,116 @@
+<!--pages/ai-debug/ai-debug.wxml-->
+<view class="container">
+  <view class="header">
+    <text class="title">🤖 AI问题诊断工具</text>
+    <text class="subtitle">全面诊断AI系统问题并自动修复</text>
+  </view>
+
+  <!-- 诊断操作区域 -->
+  <view class="action-section">
+    <button 
+      class="debug-btn {{isRunning ? 'running' : ''}}"
+      bindtap="startAIDebug"
+      disabled="{{isRunning}}"
+    >
+      <text wx:if="{{!isRunning}}">🔍 开始诊断</text>
+      <text wx:else>⏳ 诊断中...</text>
+    </button>
+    
+    <button 
+      class="test-btn"
+      bindtap="retestAIFunction"
+      disabled="{{isRunning}}"
+    >
+      🧪 测试AI功能
+    </button>
+  </view>
+
+  <!-- 诊断结果区域 -->
+  <view class="result-section" wx:if="{{debugResult}}">
+    <view class="result-header">
+      <text class="result-title">📊 诊断结果</text>
+      <button class="copy-btn" bindtap="copyDebugResult">📋 复制</button>
+    </view>
+    
+    <view class="result-content">
+      <view class="status-item">
+        <text class="status-label">整体状态:</text>
+        <text class="status-value {{debugResult.overallStatus}}">
+          {{debugResult.overallStatus === 'healthy' ? '✅ 正常' : 
+            debugResult.overallStatus === 'needs_data' ? '⚠️ 需要数据' :
+            debugResult.overallStatus === 'missing_collection' ? '❌ 集合缺失' :
+            debugResult.overallStatus === 'environment_error' ? '🚨 环境错误' : '❓ 未知'}}
+        </text>
+      </view>
+      
+      <view class="issue-item">
+        <text class="issue-label">主要问题:</text>
+        <text class="issue-value">{{debugResult.mainIssue}}</text>
+      </view>
+      
+      <view class="recommendations-item">
+        <text class="recommendations-label">修复建议:</text>
+        <view class="recommendations-list">
+          <text wx:for="{{debugResult.recommendations}}" wx:key="index" class="recommendation-item">
+            {{item}}
+          </text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 历史记录区域 -->
+  <view class="history-section">
+    <view class="history-header">
+      <text class="history-title">📝 诊断历史</text>
+      <view class="history-actions">
+        <button class="toggle-btn" bindtap="toggleHistory">
+          {{showHistory ? '隐藏' : '显示'}}
+        </button>
+        <button class="clear-btn" bindtap="clearHistory" wx:if="{{debugHistory.length > 0}}">
+          清空
+        </button>
+      </view>
+    </view>
+    
+    <view class="history-content" wx:if="{{showHistory}}">
+      <view wx:if="{{debugHistory.length === 0}}" class="empty-history">
+        <text>暂无诊断记录</text>
+      </view>
+      
+      <view wx:else class="history-list">
+        <view 
+          wx:for="{{debugHistory}}" 
+          wx:key="id" 
+          class="history-item"
+          bindtap="viewHistoryDetail"
+          data-index="{{index}}"
+        >
+          <view class="history-time">{{item.timestamp}}</view>
+          <view class="history-status">
+            <text class="status-badge {{item.result.overallStatus}}">
+              {{item.result.overallStatus === 'healthy' ? '正常' : 
+                item.result.overallStatus === 'needs_data' ? '需修复' :
+                item.result.overallStatus === 'missing_collection' ? '缺失' :
+                item.result.overallStatus === 'environment_error' ? '错误' : '未知'}}
+            </text>
+          </view>
+          <view class="history-issue">{{item.result.mainIssue}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 使用说明 -->
+  <view class="help-section">
+    <view class="help-header">
+      <text class="help-title">💡 使用说明</text>
+    </view>
+    <view class="help-content">
+      <text class="help-text">1. 点击"开始诊断"进行全面AI系统检查</text>
+      <text class="help-text">2. 系统会自动检测并修复常见问题</text>
+      <text class="help-text">3. 诊断完成后可查看详细报告</text>
+      <text class="help-text">4. 使用"测试AI功能"验证修复效果</text>
+    </view>
+  </view>
+</view>

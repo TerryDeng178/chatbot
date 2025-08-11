@@ -1,0 +1,9 @@
+{
+  "name": "user-get-welcome-package",
+  "version": "1.0.0",
+  "description": "获取欢迎包和角色列表",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

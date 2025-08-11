@@ -1,0 +1,12 @@
+{
+  "name": "system-status",
+  "version": "1.0.0", 
+  "description": "系统状态监控云函数 - 负载均衡和性能监控",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  },
+  "keywords": ["云函数", "系统监控", "负载均衡", "性能指标"],
+  "author": "",
+  "license": "ISC"
+}

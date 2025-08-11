@@ -1,0 +1,99 @@
+<!-- 聊天界面页 - 严格按照V7原型设计 -->
+<view class="chat-container">
+  <!-- 顶部导航栏 -->
+  <view class="header">
+    <view class="header-content">
+      <view class="back-btn" bindtap="goBack">
+        <view class="back-icon">←</view>
+      </view>
+      <view class="header-title">{{currentCharacter.name || '心灵导师温情'}}</view>
+    </view>
+  </view>
+
+  <!-- 聊天头部信息 - 按照V7设计 -->
+  <view class="chat-header">
+    <view class="chat-header-content">
+      <view class="character-avatar">
+        <view class="character-icon">🤖</view>
+      </view>
+      <view class="character-info">
+        <view class="character-name">{{currentCharacter.name || '心灵导师温情'}}</view>
+        <view class="character-status">在线 · 知识丰富 · 共情力强</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 消息区域 -->
+  <scroll-view class="message-area" scroll-y="true" scroll-top="{{scrollTop}}" scroll-into-view="{{toView}}">
+    <view class="messages-content">
+      <block wx:for="{{messages}}" wx:key="id">
+        <!-- AI消息 -->
+        <view class="message-container ai-msg" wx:if="{{item.role === 'assistant'}}">
+          <view class="message-wrapper">
+            <view class="ai-message-row">
+              <view class="ai-avatar-small">
+                <view class="ai-icon">🤖</view>
+              </view>
+              <view class="message-bubble ai-bubble">
+                {{item.content}}
+              </view>
+            </view>
+            <view class="message-time ai-time">{{item.time}}</view>
+          </view>
+        </view>
+        
+        <!-- 用户消息 -->
+        <view class="message-container user-msg" wx:else>
+          <view class="message-wrapper user-wrapper">
+            <view class="user-message-row">
+              <view class="message-bubble user-bubble">
+                {{item.content}}
+              </view>
+              <view class="user-avatar-small">
+                <view class="user-icon">👤</view>
+              </view>
+            </view>
+            <view class="message-time user-time">{{item.time}}</view>
+          </view>
+        </view>
+      </block>
+      
+      <!-- 加载中状态 -->
+      <view class="message-container ai-msg" wx:if="{{isLoading}}">
+        <view class="message-wrapper">
+          <view class="ai-message-row">
+            <view class="ai-avatar-small">
+              <view class="loading-icon">🤖</view>
+            </view>
+            <view class="message-bubble ai-bubble loading-bubble">
+              <view class="typing-indicator">
+                <view class="dot"></view>
+                <view class="dot"></view>
+                <view class="dot"></view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 底部输入区域 - 严格按照V7设计 -->
+  <view class="chat-footer">
+    <view class="input-box">
+      <view class="emoji-btn">😊</view>
+      <input 
+        class="message-input" 
+        type="text" 
+        placeholder="输入想要倾诉的内容..." 
+        value="{{inputText}}"
+        bindinput="onInputChange"
+        confirm-type="send"
+        bindconfirm="sendMessage"
+      />
+    </view>
+    <view class="send-btn {{inputText ? 'active' : ''}}" bindtap="sendMessage">
+      <view class="send-icon">➤</view>
+    </view>
+  </view>
+</view>

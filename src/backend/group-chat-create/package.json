@@ -1,0 +1,12 @@
+{
+  "name": "group-chat-create",
+  "version": "1.0.0",
+  "description": "创建群聊云函数",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  },
+  "keywords": ["云函数", "群聊", "创建"],
+  "author": "",
+  "license": "ISC"
+}
