@@ -12,6 +12,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
+      # 兼容 CloudBase CLI 的两套命名
+      TENCENTCLOUD_SECRETID: ${{ secrets.TENCENTCLOUD_SECRET_ID }}
+      TENCENTCLOUD_SECRETKEY: ${{ secrets.TENCENTCLOUD_SECRET_KEY }}
       TENCENTCLOUD_SECRET_ID: ${{ secrets.TENCENTCLOUD_SECRET_ID }}
       TENCENTCLOUD_SECRET_KEY: ${{ secrets.TENCENTCLOUD_SECRET_KEY }}
     steps:
@@ -24,18 +27,22 @@ jobs:
           node-version: '18'
 
       - name: Install CloudBase CLI
-        run: npm i -g @cloudbase/cli
+        run: npm i -g @cloudbase/cli@2.8.1
 
       - name: Deploy group-chat-get-messages
         run: |
           cd src/backend/group-chat-get-messages
           npm ci --no-audit --no-fund || npm i --no-audit --no-fund
+          set +e
+          tcb fn deploy group-chat-get-messages -e $TCB_ENV_ID --force || \
+          tcb login --apiKeyId "$TENCENTCLOUD_SECRETID" --apiKey "$TENCENTCLOUD_SECRETKEY" && \
           tcb fn deploy group-chat-get-messages -e $TCB_ENV_ID --force
 
       - name: Deploy group-chat-multi-ai
         run: |
           cd src/backend/group-chat-multi-ai
           npm ci --no-audit --no-fund || npm i --no-audit --no-fund
+          set +e
+          tcb fn deploy group-chat-multi-ai -e $TCB_ENV_ID --force || \
+          tcb login --apiKeyId "$TENCENTCLOUD_SECRETID" --apiKey "$TENCENTCLOUD_SECRETKEY" && \
           tcb fn deploy group-chat-multi-ai -e $TCB_ENV_ID --force
-
-
