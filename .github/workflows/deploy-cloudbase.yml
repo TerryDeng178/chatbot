@@ -11,6 +11,9 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      TENCENTCLOUD_SECRET_ID: ${{ secrets.TENCENTCLOUD_SECRET_ID }}
+      TENCENTCLOUD_SECRET_KEY: ${{ secrets.TENCENTCLOUD_SECRET_KEY }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -24,18 +27,12 @@ jobs:
         run: npm i -g @cloudbase/cli
 
       - name: Deploy group-chat-get-messages
-        env:
-          TENCENTCLOUD_SECRET_ID: ${{ secrets.TENCENTCLOUD_SECRET_ID }}
-          TENCENTCLOUD_SECRET_KEY: ${{ secrets.TENCENTCLOUD_SECRET_KEY }}
         run: |
           cd src/backend/group-chat-get-messages
           npm ci --no-audit --no-fund || npm i --no-audit --no-fund
           tcb fn deploy group-chat-get-messages -e $TCB_ENV_ID --force
 
       - name: Deploy group-chat-multi-ai
-        env:
-          TENCENTCLOUD_SECRET_ID: ${{ secrets.TENCENTCLOUD_SECRET_ID }}
-          TENCENTCLOUD_SECRET_KEY: ${{ secrets.TENCENTCLOUD_SECRET_KEY }}
         run: |
           cd src/backend/group-chat-multi-ai
           npm ci --no-audit --no-fund || npm i --no-audit --no-fund
